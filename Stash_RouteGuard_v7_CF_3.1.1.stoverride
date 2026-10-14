@@ -1,0 +1,122 @@
+name: Stash RouteGuard v7 (Prepend Firewall)
+desc: 规则模式修复版（不改现有节点测速周期）。利用 Stash 覆写“数组默认插入到最前面”的机制：明确国内服务 DIRECT，其余流量立即 MATCH 到现有且已验证工作的“CF 移动优选”。不新建代理组、不改 DNS、不使用 #!replace，避免被原有 copilot 规则抢先命中。兼容 Stash 3.1.1。
+category: General
+
+# 只新增国内白名单规则集；不修改 DNS、不创建代理组。
+rule-providers:
+  RouteGuard-Alibaba:
+    behavior: domain
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Alibaba/Alibaba_Domain.yaml
+
+  RouteGuard-XianYu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XianYu/XianYu.yaml
+
+  RouteGuard-MeiTuan:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/MeiTuan/MeiTuan.yaml
+
+  RouteGuard-Eleme:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Eleme/Eleme.yaml
+
+  RouteGuard-BiliBili:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+
+  RouteGuard-XiaoHongShu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XiaoHongShu/XiaoHongShu.yaml
+
+  RouteGuard-Weibo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Weibo/Weibo.yaml
+
+  RouteGuard-Tencent:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Tencent/Tencent.yaml
+
+  RouteGuard-WeChat:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml
+
+  RouteGuard-Baidu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Baidu/Baidu.yaml
+
+  RouteGuard-DouYin:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DouYin/DouYin.yaml
+
+  RouteGuard-JingDong:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/JingDong/JingDong.yaml
+
+  RouteGuard-NetEase:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/NetEase/NetEase.yaml
+
+  RouteGuard-GaoDe:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GaoDe/GaoDe.yaml
+
+  RouteGuard-DiDi:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DiDi/DiDi.yaml
+
+# 关键：这里故意不写 #!replace。
+# Stash 对数组型 rules 的默认行为是把本覆写规则插入原规则数组最前面。
+# 因为本段最后一条就是 MATCH，后面的原有 copilot / China / Final 规则不会再获得匹配机会。
+rules:
+  # 本机 / 局域网
+  - DOMAIN,localhost.weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,in-addr.arpa,DIRECT
+  - DOMAIN-SUFFIX,ip6.arpa,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+
+  # 明确国内白名单
+  - RULE-SET,RouteGuard-Alibaba,DIRECT
+  - RULE-SET,RouteGuard-XianYu,DIRECT
+  - RULE-SET,RouteGuard-MeiTuan,DIRECT
+  - RULE-SET,RouteGuard-Eleme,DIRECT
+  - RULE-SET,RouteGuard-BiliBili,DIRECT
+  - RULE-SET,RouteGuard-XiaoHongShu,DIRECT
+  - RULE-SET,RouteGuard-Weibo,DIRECT
+  - RULE-SET,RouteGuard-Tencent,DIRECT
+  - RULE-SET,RouteGuard-WeChat,DIRECT
+  - RULE-SET,RouteGuard-Baidu,DIRECT
+  - RULE-SET,RouteGuard-DouYin,DIRECT
+  - RULE-SET,RouteGuard-JingDong,DIRECT
+  - RULE-SET,RouteGuard-NetEase,DIRECT
+  - RULE-SET,RouteGuard-GaoDe,DIRECT
+  - RULE-SET,RouteGuard-DiDi,DIRECT
+
+  # 常用国内补充
+  - DOMAIN-SUFFIX,doubao.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+
+  # 所有其他流量直接进入你当前已存在、已在连接列表中验证工作的代理策略
+  - MATCH,CF 移动优选
