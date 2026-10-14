@@ -1,0 +1,485 @@
+name: Stash 智能分流 + DNS 防泄漏（严格白名单 v5 / QUIC 防直连）
+desc: 严格白名单模式 + QUIC 防直连：国内明确白名单 DIRECT，其余流量默认代理；对非白名单 UDP/443 直接 REJECT，强制 Safari/应用回落 TCP 后经代理，避免节点不支持 UDP 时真实出口暴露。保留国内低延迟 DNS、DNS 防泄漏与 120 秒自动测速。兼容 Stash 3.1.1。
+category: General
+
+# ============================================================
+# 1) DNS：国外防泄漏 + 国内低延迟分流解析
+# ============================================================
+ipv6: false
+
+dns: #!replace
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+
+  # 保留防泄漏逻辑：国外 DNS 请求仍按分流规则经代理转发。
+  # 国内域名通过 nameserver-policy 改走国内 DoH，避免绕美国节点解析
+  # 导致 CDN 调度到境外、淘宝/美团等首开和图片加载变慢。
+  follow-rule: true
+
+  # 仅用于解析 DoH 服务器主机名；不使用 system DNS。
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  # 默认（主要给国外/代理流量）仍使用海外 DoH；在现有规则下会走代理。
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+
+  # Stash 3.1.1 兼容写法：每个 policy 使用单个字符串，不使用数组/geosite。
+  # 国内高频服务使用阿里公共 DoH，就近返回中国 CDN/业务节点。
+  nameserver-policy:
+    # 淘宝 / 天猫 / 支付宝 / 阿里云 / 闲鱼
+    '+.taobao.com': 'https://dns.alidns.com/dns-query'
+    '+.tmall.com': 'https://dns.alidns.com/dns-query'
+    '+.alicdn.com': 'https://dns.alidns.com/dns-query'
+    '+.taobaocdn.com': 'https://dns.alidns.com/dns-query'
+    '+.tbcdn.cn': 'https://dns.alidns.com/dns-query'
+    '+.alipay.com': 'https://dns.alidns.com/dns-query'
+    '+.alipayobjects.com': 'https://dns.alidns.com/dns-query'
+    '+.aliyun.com': 'https://dns.alidns.com/dns-query'
+    '+.aliyuncs.com': 'https://dns.alidns.com/dns-query'
+    '+.goofish.com': 'https://dns.alidns.com/dns-query'
+    '+.xianyu.mobi': 'https://dns.alidns.com/dns-query'
+
+    # 美团 / 大众点评 / 饿了么
+    '+.meituan.com': 'https://dns.alidns.com/dns-query'
+    '+.meituan.net': 'https://dns.alidns.com/dns-query'
+    '+.sankuai.com': 'https://dns.alidns.com/dns-query'
+    '+.dianping.com': 'https://dns.alidns.com/dns-query'
+    '+.dpfile.com': 'https://dns.alidns.com/dns-query'
+    '+.ele.me': 'https://dns.alidns.com/dns-query'
+
+    # 地图 / 定位资源（国内生活服务常调用）
+    '+.amap.com': 'https://dns.alidns.com/dns-query'
+    '+.autonavi.com': 'https://dns.alidns.com/dns-query'
+    '+.gaode.com': 'https://dns.alidns.com/dns-query'
+
+    # Bilibili / 小红书 / 微博 / 字节
+    '+.bilibili.com': 'https://dns.alidns.com/dns-query'
+    '+.biliapi.com': 'https://dns.alidns.com/dns-query'
+    '+.biliapi.net': 'https://dns.alidns.com/dns-query'
+    '+.bilivideo.com': 'https://dns.alidns.com/dns-query'
+    '+.hdslb.com': 'https://dns.alidns.com/dns-query'
+    '+.xiaohongshu.com': 'https://dns.alidns.com/dns-query'
+    '+.xhscdn.com': 'https://dns.alidns.com/dns-query'
+    '+.weibo.com': 'https://dns.alidns.com/dns-query'
+    '+.weibocdn.com': 'https://dns.alidns.com/dns-query'
+    '+.douyin.com': 'https://dns.alidns.com/dns-query'
+    '+.douyincdn.com': 'https://dns.alidns.com/dns-query'
+    '+.byteimg.com': 'https://dns.alidns.com/dns-query'
+    '+.bytedance.com': 'https://dns.alidns.com/dns-query'
+    '+.toutiao.com': 'https://dns.alidns.com/dns-query'
+
+    # 微信 / QQ / 京东 / 百度 / 网易
+    '+.qq.com': 'https://dns.alidns.com/dns-query'
+    '+.qcloud.com': 'https://dns.alidns.com/dns-query'
+    '+.weixin.qq.com': 'https://dns.alidns.com/dns-query'
+    '+.jd.com': 'https://dns.alidns.com/dns-query'
+    '+.360buyimg.com': 'https://dns.alidns.com/dns-query'
+    '+.baidu.com': 'https://dns.alidns.com/dns-query'
+    '+.bdstatic.com': 'https://dns.alidns.com/dns-query'
+    '+.bcebos.com': 'https://dns.alidns.com/dns-query'
+    '+.163.com': 'https://dns.alidns.com/dns-query'
+    '+.126.net': 'https://dns.alidns.com/dns-query'
+
+  # 国内直连 App 不使用 Fake-IP，直接取得真实中国 CDN IP，提升兼容性与首开速度。
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.home.arpa'
+    - '*.in-addr.arpa'
+    - '*.ip6.arpa'
+    - '*._dns-sd._udp.*.in-addr.arpa'
+    - 'localhost'
+    - 'localhost.weixin.qq.com'
+    - '+.stun.*.*'
+    - '+.stun.*.*.*'
+    - '+.stun.*.*.*.*'
+    - '+.stun.*.*.*.*.*'
+    - 'captive.apple.com'
+    - '*.icloud.com'
+    - '*.icloud-content.com'
+    - '*.apple-cloudkit.com'
+    - '*.cdn-apple.com'
+    - '*.mzstatic.com'
+    - '*.ccb.com'
+    - '*.abchina.com.cn'
+    - '*.psbc.com'
+    - '*.taobao.com'
+    - '*.tmall.com'
+    - '*.alicdn.com'
+    - '*.taobaocdn.com'
+    - '*.tbcdn.cn'
+    - '*.alipay.com'
+    - '*.alipayobjects.com'
+    - '*.goofish.com'
+    - '*.xianyu.mobi'
+    - '*.meituan.com'
+    - '*.meituan.net'
+    - '*.sankuai.com'
+    - '*.dianping.com'
+    - '*.dpfile.com'
+    - '*.ele.me'
+    - '*.amap.com'
+    - '*.autonavi.com'
+    - '*.bilibili.com'
+    - '*.biliapi.com'
+    - '*.biliapi.net'
+    - '*.bilivideo.com'
+    - '*.hdslb.com'
+    - '*.xiaohongshu.com'
+    - '*.xhscdn.com'
+    - '*.qq.com'
+    - '*.qcloud.com'
+    - '*.weixin.qq.com'
+    - '*.jd.com'
+    - '*.360buyimg.com'
+    - '*.baidu.com'
+    - '*.bdstatic.com'
+    - '*.bcebos.com'
+    - '*.163.com'
+    - '*.126.net'
+    - '*.douyin.com'
+    - '*.douyincdn.com'
+    - '*.byteimg.com'
+    - '*.bytedance.com'
+    - '*.toutiao.com'
+    - '*.amap.com'
+    - '*.amapauto.com'
+    - '*.autonavi.com'
+    - '*.gaode.com'
+
+# ============================================================
+# 2) 自动测速 / 策略组（120 秒自动重测）
+# ============================================================
+proxy-groups:
+  - name: 🌐 STASH-全部自动
+    type: url-test
+    include-all: true
+    interval: 120
+    tolerance: 50
+    lazy: true
+
+  - name: 🇺🇸 STASH-美国自动
+    type: url-test
+    include-all: true
+    filter: '(?i)(🇺🇸|美国|美國|US|USA|United States|America|Los Angeles|San Jose|Seattle|New York|Chicago|Dallas|Boston|Phoenix|洛杉矶|洛杉磯|圣何塞|聖何塞|西雅图|西雅圖|纽约|紐約|芝加哥|达拉斯|達拉斯|波士顿|波士頓|凤凰城|鳳凰城)'
+    interval: 120
+    tolerance: 50
+    lazy: true
+
+  - name: 🚀 STASH-主代理
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+  - name: 🤖 STASH-AI
+    type: select
+    proxies:
+      - 🇺🇸 STASH-美国自动
+      - 🌐 STASH-全部自动
+      - DIRECT
+
+  - name: 📹 STASH-YouTube
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+  - name: 🎵 STASH-Spotify
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+  - name: 🎬 STASH-TikTok
+    type: select
+    proxies:
+      - 🇺🇸 STASH-美国自动
+      - 🌐 STASH-全部自动
+      - DIRECT
+
+  - name: 🔍 STASH-Google
+    type: select
+    proxies:
+      - 🇺🇸 STASH-美国自动
+      - 🌐 STASH-全部自动
+      - DIRECT
+
+  - name: 📱 STASH-Telegram
+    type: select
+    proxies:
+      - 🇺🇸 STASH-美国自动
+      - 🌐 STASH-全部自动
+      - DIRECT
+
+  - name: 💻 STASH-开发服务
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+  - name: Ⓜ️ STASH-Microsoft
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+  - name: 🍏 STASH-Apple
+    type: select
+    proxies:
+      - DIRECT
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+
+  - name: 🐟 STASH-兜底
+    type: select
+    proxies:
+      - 🌐 STASH-全部自动
+      - 🇺🇸 STASH-美国自动
+      - DIRECT
+
+# ============================================================
+# 3) 远程规则集
+# ============================================================
+rule-providers:
+  # 国内核心服务：放在 HTTPDNS 拦截前，优先 DIRECT。
+  Stash-Alibaba:
+    behavior: domain
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Alibaba/Alibaba_Domain.yaml
+
+  Stash-XianYu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XianYu/XianYu.yaml
+
+  Stash-MeiTuan:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/MeiTuan/MeiTuan.yaml
+
+  Stash-Eleme:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Eleme/Eleme.yaml
+
+  Stash-BlockHttpDNS:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BlockHttpDNS/BlockHttpDNS.yaml
+
+  Stash-BiliBili:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+
+  Stash-XiaoHongShu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XiaoHongShu/XiaoHongShu.yaml
+
+  Stash-Weibo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Weibo/Weibo.yaml
+
+  Stash-Tencent:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Tencent/Tencent.yaml
+
+  Stash-WeChat:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml
+
+  Stash-Baidu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Baidu/Baidu.yaml
+
+  Stash-DouYin:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DouYin/DouYin.yaml
+
+  Stash-JingDong:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/JingDong/JingDong.yaml
+
+  Stash-NetEase:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/NetEase/NetEase.yaml
+
+  Stash-GaoDe:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GaoDe/GaoDe.yaml
+
+  Stash-DiDi:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DiDi/DiDi.yaml
+
+  Stash-OpenAI:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml
+
+  Stash-Claude:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.yaml
+
+  Stash-Gemini:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml
+
+  Stash-YouTube:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.yaml
+
+  Stash-Spotify:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml
+
+  Stash-TikTok:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TikTok/TikTok.yaml
+
+  Stash-Google:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google.yaml
+
+  Stash-Telegram:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml
+
+  Stash-GitHub:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.yaml
+
+  Stash-GitLab:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitLab/GitLab.yaml
+
+  Stash-Atlassian:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Atlassian/Atlassian.yaml
+
+  Stash-Microsoft:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Microsoft/Microsoft.yaml
+
+# ============================================================
+# 4) QUIC 防直连
+# ============================================================
+# Stash 官方建议代理场景禁用 QUIC；HTTP/3 基于 UDP。
+# 这里仅拦截未先命中国内/Apple DIRECT 白名单的 UDP/443，
+# 让 Safari/应用回落到 TCP/HTTP2，再按代理规则转发。
+script:
+  shortcuts:
+    stash-quic-proxy-guard: network == 'udp' and dst_port == 443
+
+# ============================================================
+# 5) 分流规则（v5：DIRECT 严格白名单 + 非白名单 QUIC 拦截）
+# ============================================================
+rules: #!replace
+  # ---- 本机 / 局域网基础通信 ----
+  - DOMAIN,localhost.weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,in-addr.arpa,DIRECT
+  - DOMAIN-SUFFIX,ip6.arpa,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+
+  # ---- 国内 DoH / 已知 HTTPDNS ----
+  - DOMAIN,dns.alidns.com,DIRECT
+  - DOMAIN,doh.pub,DIRECT
+  - IP-CIDR,203.107.1.1/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.98/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.99/32,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,httpdns.alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.meituan.com,DIRECT
+
+  # ---- Apple：当前默认 DIRECT；放在 QUIC 拦截前，保持系统服务兼容性 ----
+  - DOMAIN-SUFFIX,apple.com,🍏 STASH-Apple
+  - DOMAIN-SUFFIX,icloud.com,🍏 STASH-Apple
+  - DOMAIN-SUFFIX,icloud-content.com,🍏 STASH-Apple
+  - DOMAIN-SUFFIX,apple-cloudkit.com,🍏 STASH-Apple
+  - DOMAIN-SUFFIX,cdn-apple.com,🍏 STASH-Apple
+  - DOMAIN-SUFFIX,mzstatic.com,🍏 STASH-Apple
+
+  # ---- 国内严格白名单：这些服务可直接使用中国本地网络 ----
+  - RULE-SET,Stash-Alibaba,DIRECT
+  - RULE-SET,Stash-XianYu,DIRECT
+  - RULE-SET,Stash-MeiTuan,DIRECT
+  - RULE-SET,Stash-Eleme,DIRECT
+  - RULE-SET,Stash-BiliBili,DIRECT
+  - RULE-SET,Stash-XiaoHongShu,DIRECT
+  - RULE-SET,Stash-Weibo,DIRECT
+  - RULE-SET,Stash-Tencent,DIRECT
+  - RULE-SET,Stash-WeChat,DIRECT
+  - RULE-SET,Stash-Baidu,DIRECT
+  - RULE-SET,Stash-DouYin,DIRECT
+  - RULE-SET,Stash-JingDong,DIRECT
+  - RULE-SET,Stash-NetEase,DIRECT
+  - RULE-SET,Stash-GaoDe,DIRECT
+  - RULE-SET,Stash-DiDi,DIRECT
+  - DOMAIN-SUFFIX,doubao.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+
+  # ---- 关键修正：其余 UDP/443（HTTP/3 / QUIC）不允许直接逃逸 ----
+  # 命中后 REJECT，浏览器通常会自动回落 TCP/HTTP2，再继续按下面代理规则连接。
+  - SCRIPT,stash-quic-proxy-guard,REJECT
+
+  # ---- 明确国外服务：TCP/回落流量走代理 ----
+  - RULE-SET,Stash-OpenAI,🤖 STASH-AI
+  - RULE-SET,Stash-Claude,🤖 STASH-AI
+  - RULE-SET,Stash-Gemini,🤖 STASH-AI
+  - DOMAIN,translate.googleapis.com,📹 STASH-YouTube
+  - DOMAIN,translate-pa.googleapis.com,📹 STASH-YouTube
+  - RULE-SET,Stash-YouTube,📹 STASH-YouTube
+  - RULE-SET,Stash-Spotify,🎵 STASH-Spotify
+  - RULE-SET,Stash-TikTok,🎬 STASH-TikTok
+  - RULE-SET,Stash-Telegram,📱 STASH-Telegram
+  - RULE-SET,Stash-GitHub,💻 STASH-开发服务
+  - RULE-SET,Stash-GitLab,💻 STASH-开发服务
+  - RULE-SET,Stash-Atlassian,💻 STASH-开发服务
+  - RULE-SET,Stash-Google,🔍 STASH-Google
+  - RULE-SET,Stash-Microsoft,Ⓜ️ STASH-Microsoft
+
+  # ---- 其余已知 HTTPDNS / 应用自带 DNS 拦截 ----
+  - RULE-SET,Stash-BlockHttpDNS,REJECT
+
+  # ---- 所有其他未知流量一律代理 ----
+  # 不为 BrowserLeaks / IPLeak / DNSLeakTest 添加任何特殊白名单。
+  - MATCH,🐟 STASH-兜底
