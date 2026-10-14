@@ -1,0 +1,474 @@
+name: Stash CFData-WEB Secure Split v3 (CN Fast + Apple CN)
+desc: 国内高频 App 补齐与低延迟优化版。拼多多/抖音/携程/去哪儿/滴滴/12306/京东/支付宝/微信支付等明确 DIRECT；国内域名使用定向国内 DoH；关闭 DNS follow-rule；64 节点动态安全组改为 600 秒懒测速。兼容 Stash 3.1.1。
+category: Policy
+
+ipv6: false
+
+dns: #!replace
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  follow-rule: false
+
+  # Bootstrap 只负责解析 DoH 服务器域名；国内 UDP 可降低启动/重连解析延迟。
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+
+
+  # 国内 App 定向 DNS：只让明确的中国大陆生态使用国内 DoH，
+  # BrowserLeaks / 国外网站仍使用上面的 Cloudflare / Google DoH。
+  nameserver-policy:
+    '+.cn': 'https://dns.alidns.com/dns-query'
+
+    # 阿里 / 淘宝 / 闲鱼 / 支付宝
+    '+.taobao.com': 'https://dns.alidns.com/dns-query'
+    '+.tmall.com': 'https://dns.alidns.com/dns-query'
+    '+.alicdn.com': 'https://dns.alidns.com/dns-query'
+    '+.taobaocdn.com': 'https://dns.alidns.com/dns-query'
+    '+.tbcdn.cn': 'https://dns.alidns.com/dns-query'
+    '+.goofish.com': 'https://dns.alidns.com/dns-query'
+    '+.xianyu.mobi': 'https://dns.alidns.com/dns-query'
+    '+.alipay.com': 'https://dns.alidns.com/dns-query'
+    '+.alipayobjects.com': 'https://dns.alidns.com/dns-query'
+    '+.alipaydns.com': 'https://dns.alidns.com/dns-query'
+
+    # 拼多多
+    '+.pinduoduo.com': 'https://dns.alidns.com/dns-query'
+    '+.pinduoduo.net': 'https://dns.alidns.com/dns-query'
+    '+.pddpic.com': 'https://dns.alidns.com/dns-query'
+    '+.yangkeduo.com': 'https://dns.alidns.com/dns-query'
+
+    # 抖音 / 字节
+    '+.douyin.com': 'https://dns.alidns.com/dns-query'
+    '+.douyincdn.com': 'https://dns.alidns.com/dns-query'
+    '+.douyinpic.com': 'https://dns.alidns.com/dns-query'
+    '+.douyinstatic.com': 'https://dns.alidns.com/dns-query'
+    '+.douyinvod.com': 'https://dns.alidns.com/dns-query'
+    '+.amemv.com': 'https://dns.alidns.com/dns-query'
+    '+.snssdk.com': 'https://dns.alidns.com/dns-query'
+    '+.byteimg.com': 'https://dns.alidns.com/dns-query'
+    '+.bytedance.com': 'https://dns.alidns.com/dns-query'
+
+    # 携程 / 去哪儿
+    '+.ctrip.com': 'https://dns.alidns.com/dns-query'
+    '+.ctrip.cn': 'https://dns.alidns.com/dns-query'
+    '+.c-ctrip.com': 'https://dns.alidns.com/dns-query'
+    '+.tripcdn.com': 'https://dns.alidns.com/dns-query'
+    '+.qunar.com': 'https://dns.alidns.com/dns-query'
+    '+.qunarzz.com': 'https://dns.alidns.com/dns-query'
+
+    # 滴滴
+    '+.didi.cn': 'https://dns.alidns.com/dns-query'
+    '+.didichuxing.com': 'https://dns.alidns.com/dns-query'
+    '+.didistatic.com': 'https://dns.alidns.com/dns-query'
+    '+.xiaojukeji.com': 'https://dns.alidns.com/dns-query'
+    '+.udache.com': 'https://dns.alidns.com/dns-query'
+
+    # 12306
+    '+.12306.cn': 'https://dns.alidns.com/dns-query'
+    '+.95306.cn': 'https://dns.alidns.com/dns-query'
+    '+.china-railway.com.cn': 'https://dns.alidns.com/dns-query'
+
+    # 京东 / 京东支付
+    '+.jd.com': 'https://dns.alidns.com/dns-query'
+    '+.360buyimg.com': 'https://dns.alidns.com/dns-query'
+    '+.jdcdn.com': 'https://dns.alidns.com/dns-query'
+    '+.jdpay.com': 'https://dns.alidns.com/dns-query'
+
+    # 微信 / 微信支付：优先腾讯 DoH
+    '+.qq.com': 'https://doh.pub/dns-query'
+    '+.weixin.com': 'https://doh.pub/dns-query'
+    '+.wechat.com': 'https://doh.pub/dns-query'
+    '+.servicewechat.com': 'https://doh.pub/dns-query'
+    '+.tenpay.com': 'https://doh.pub/dns-query'
+    '+.wechatpay.com': 'https://doh.pub/dns-query'
+    '+.qpic.cn': 'https://doh.pub/dns-query'
+    '+.qlogo.cn': 'https://doh.pub/dns-query'
+    '+.gtimg.com': 'https://doh.pub/dns-query'
+
+    # 已有国内高频 App
+    '+.meituan.com': 'https://dns.alidns.com/dns-query'
+    '+.sankuai.com': 'https://dns.alidns.com/dns-query'
+    '+.dianping.com': 'https://dns.alidns.com/dns-query'
+    '+.bilibili.com': 'https://dns.alidns.com/dns-query'
+    '+.bilivideo.com': 'https://dns.alidns.com/dns-query'
+    '+.xiaohongshu.com': 'https://dns.alidns.com/dns-query'
+    '+.xhscdn.com': 'https://dns.alidns.com/dns-query'
+    '+.amap.com': 'https://dns.alidns.com/dns-query'
+    '+.autonavi.com': 'https://dns.alidns.com/dns-query'
+
+    # Apple 中国大陆常用生态
+    'music.apple.com': 'https://dns.alidns.com/dns-query'
+    'apps.apple.com': 'https://dns.alidns.com/dns-query'
+    'itunes.apple.com': 'https://dns.alidns.com/dns-query'
+    '+.apple.com.cn': 'https://dns.alidns.com/dns-query'
+    '+.icloud.com.cn': 'https://dns.alidns.com/dns-query'
+    '+.mzstatic.com': 'https://dns.alidns.com/dns-query'
+    '+.cdn-apple.com': 'https://dns.alidns.com/dns-query'
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.home.arpa'
+    - '*.in-addr.arpa'
+    - '*.ip6.arpa'
+    - '*._dns-sd._udp.*.in-addr.arpa'
+    - 'localhost'
+    - 'localhost.weixin.qq.com'
+    - 'captive.apple.com'
+    - '+.stun.*.*'
+    - '+.stun.*.*.*'
+    - '+.stun.*.*.*.*'
+    - '+.stun.*.*.*.*.*'
+
+# 动态安全代理组：
+# 当前 CFData-WEB-优选 的所有 64 个真实叶子节点都符合以下命名前缀。
+# DIRECT / REJECT / 原有策略组名称不会匹配。
+proxy-groups:
+  - name: 🔒 CFData安全自动
+    type: url-test
+    include-all: true
+    filter: '^(VPS789优选|WeTest优选|微测优选|优选 \|)'
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 100
+    lazy: true
+
+rule-providers:
+  Final-Alibaba:
+    behavior: domain
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Alibaba/Alibaba_Domain.yaml
+
+  Final-XianYu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XianYu/XianYu.yaml
+
+  Final-MeiTuan:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/MeiTuan/MeiTuan.yaml
+
+  Final-Eleme:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Eleme/Eleme.yaml
+
+  Final-BiliBili:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+
+  Final-XiaoHongShu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XiaoHongShu/XiaoHongShu.yaml
+
+  Final-Weibo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Weibo/Weibo.yaml
+
+  Final-Tencent:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Tencent/Tencent.yaml
+
+  Final-WeChat:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml
+
+  Final-Baidu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Baidu/Baidu.yaml
+
+  Final-DouYin:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DouYin/DouYin.yaml
+
+  Final-JingDong:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/JingDong/JingDong.yaml
+
+  Final-NetEase:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/NetEase/NetEase.yaml
+
+  Final-GaoDe:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GaoDe/GaoDe.yaml
+
+  Final-DiDi:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DiDi/DiDi.yaml
+
+  Final-AppleMusic:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleMusic/AppleMusic.yaml
+
+  Final-AppStore:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppStore/AppStore.yaml
+
+  Final-iCloud:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/iCloud/iCloud.yaml
+
+  Final-AppleID:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleID/AppleID.yaml
+
+  Final-FindMy:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/FindMy/FindMy.yaml
+
+  Final-TestFlight:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TestFlight/TestFlight.yaml
+
+  Final-AppleFirmware:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleFirmware/AppleFirmware.yaml
+
+
+  Final-Pinduoduo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Pinduoduo/Pinduoduo.yaml
+
+  Final-XieCheng:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XieCheng/XieCheng.yaml
+
+  Final-12306:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/12306/12306.yaml
+
+  Final-AliPay:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AliPay/AliPay.yaml
+
+rules: #!replace
+  # 本机 / 局域网
+  - DOMAIN,localhost.weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,in-addr.arpa,DIRECT
+  - DOMAIN-SUFFIX,ip6.arpa,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+
+  # 国内 App 的 HTTPDNS / 低延迟入口
+  - IP-CIDR,203.107.1.1/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.98/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.99/32,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,httpdns.alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.meituan.com,DIRECT
+
+  # 国内常用服务显式直连
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,taobaocdn.com,DIRECT
+  - DOMAIN-SUFFIX,tbcdn.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  - DOMAIN-SUFFIX,goofish.com,DIRECT
+  - DOMAIN-SUFFIX,xianyu.mobi,DIRECT
+
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.net,DIRECT
+  - DOMAIN-SUFFIX,sankuai.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,dpfile.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.net,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,b23.tv,DIRECT
+
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,weibocdn.com,DIRECT
+
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bcebos.com,DIRECT
+
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyincdn.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,toutiao.com,DIRECT
+
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,amapauto.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-SUFFIX,gaode.com,DIRECT
+
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+
+  # 国内规则集补全
+  - RULE-SET,Final-Alibaba,DIRECT
+  - RULE-SET,Final-XianYu,DIRECT
+  - RULE-SET,Final-MeiTuan,DIRECT
+  - RULE-SET,Final-Eleme,DIRECT
+  - RULE-SET,Final-BiliBili,DIRECT
+  - RULE-SET,Final-XiaoHongShu,DIRECT
+  - RULE-SET,Final-Weibo,DIRECT
+  - RULE-SET,Final-Tencent,DIRECT
+  - RULE-SET,Final-WeChat,DIRECT
+  - RULE-SET,Final-Baidu,DIRECT
+  - RULE-SET,Final-DouYin,DIRECT
+  - RULE-SET,Final-JingDong,DIRECT
+  - RULE-SET,Final-NetEase,DIRECT
+  - RULE-SET,Final-GaoDe,DIRECT
+  - RULE-SET,Final-DiDi,DIRECT
+
+  # 所有其他公网流量：强制进入动态安全代理组，无 DIRECT 兜底
+  # ---- Apple 中国大陆常用生态：直连 ----
+  # Apple Music / App Store / iCloud 中国区 / Apple ID / 查找 / TestFlight / 系统更新
+  # 明确不把 Apple TV+ / Apple News 整体设为 DIRECT，避免影响需要海外区域的服务。
+  - DOMAIN-SUFFIX,apple.com.cn,DIRECT
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT
+  - DOMAIN,music.apple.com,DIRECT
+  - DOMAIN,apps.apple.com,DIRECT
+  - DOMAIN,itunes.apple.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-content.com,DIRECT
+  - DOMAIN-SUFFIX,apple-cloudkit.com,DIRECT
+  - DOMAIN-SUFFIX,me.com,DIRECT
+  - DOMAIN-SUFFIX,apple-dns.net,DIRECT
+  - DOMAIN,push.apple.com,DIRECT
+  - DOMAIN,gs.apple.com,DIRECT
+  - DOMAIN,gdmf.apple.com,DIRECT
+  - DOMAIN,mesu.apple.com,DIRECT
+
+  - RULE-SET,Final-AppleMusic,DIRECT
+  - RULE-SET,Final-AppStore,DIRECT
+  - RULE-SET,Final-iCloud,DIRECT
+  - RULE-SET,Final-AppleID,DIRECT
+  - RULE-SET,Final-FindMy,DIRECT
+  - RULE-SET,Final-TestFlight,DIRECT
+  - RULE-SET,Final-AppleFirmware,DIRECT
+
+  # ---- 国内高频 App v3 补齐：显式直连 ----
+
+  # 拼多多
+  - DOMAIN-SUFFIX,pinduoduo.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.net,DIRECT
+  - DOMAIN-SUFFIX,pddpic.com,DIRECT
+  - DOMAIN-SUFFIX,yangkeduo.com,DIRECT
+
+  # 抖音 / 字节视频资源
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,ixigua.com,DIRECT
+  - DOMAIN-SUFFIX,ixiguavideo.com,DIRECT
+
+  # 携程
+  - DOMAIN-SUFFIX,c-ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.cn,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctripbiz.com,DIRECT
+  - DOMAIN-SUFFIX,tripcdn.com,DIRECT
+  - DOMAIN-SUFFIX,suanya.com,DIRECT
+  - DOMAIN-SUFFIX,tieyou.com,DIRECT
+
+  # 去哪儿
+  - DOMAIN-SUFFIX,qunar.com,DIRECT
+  - DOMAIN-SUFFIX,qunarzz.com,DIRECT
+
+  # 滴滴
+  - DOMAIN-SUFFIX,didi.cn,DIRECT
+  - DOMAIN-SUFFIX,didichuxing.com,DIRECT
+  - DOMAIN-SUFFIX,didistatic.com,DIRECT
+  - DOMAIN-SUFFIX,didiapp.net.cn,DIRECT
+  - DOMAIN-SUFFIX,didiopenapi.com,DIRECT
+  - DOMAIN-SUFFIX,udache.com,DIRECT
+  - DOMAIN-SUFFIX,xiaojukeji.com,DIRECT
+
+  # 12306 / 国铁
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,95306.cn,DIRECT
+  - DOMAIN-SUFFIX,china-railway.com.cn,DIRECT
+  - DOMAIN-SUFFIX,rails.cn,DIRECT
+
+  # 京东 / 京东支付
+  - DOMAIN-SUFFIX,360buy.com,DIRECT
+  - DOMAIN-SUFFIX,jdcdn.com,DIRECT
+  - DOMAIN-SUFFIX,jdpay.com,DIRECT
+  - DOMAIN-SUFFIX,jdpaydns.com,DIRECT
+  - DOMAIN-SUFFIX,jdfinance.com,DIRECT
+  - DOMAIN-SUFFIX,jdjinrong.com,DIRECT
+
+  # 支付宝
+  - DOMAIN-SUFFIX,alipay.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.com.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.net,DIRECT
+  - DOMAIN-SUFFIX,alipaydns.com,DIRECT
+  - DOMAIN-SUFFIX,alipaylog.com,DIRECT
+  - DOMAIN-SUFFIX,alipayplus.com,DIRECT
+
+  # 微信 / 微信支付
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.com,DIRECT
+  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+
+  # 规则集兜底补全
+  - RULE-SET,Final-Pinduoduo,DIRECT
+  - RULE-SET,Final-XieCheng,DIRECT
+  - RULE-SET,Final-12306,DIRECT
+  - RULE-SET,Final-AliPay,DIRECT
+
+  - MATCH,🔒 CFData安全自动
