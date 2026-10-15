@@ -1,0 +1,566 @@
+name: Stash Universal Secure Split v7 (Bilibili CN + CN Fast)
+desc: v7 Bilibili 中国大陆优化版：Bilibili 主站/API/视频/CDN 强制 DIRECT + 国内 DNS；Bilibili Intl/Bstar 国际端点不再误归入国内直连。保留 v6 的国内 App、Apple Music、国外安全出口与双主配置兼容逻辑。兼容 Stash 3.1.1。
+category: Policy
+
+ipv6: false
+
+dns: #!replace
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  follow-rule: true
+
+  # Bootstrap 只负责解析 DoH 服务器域名；国内 UDP 可降低启动/重连解析延迟。
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+
+
+  # 国内 App 定向 DNS：只让明确的中国大陆生态使用国内 DoH，
+  # BrowserLeaks / 国外网站仍使用上面的 Cloudflare / Google DoH。
+  nameserver-policy:
+    '+.cn': '223.5.5.5'
+
+    # 阿里 / 淘宝 / 闲鱼 / 支付宝
+    '+.taobao.com': '223.5.5.5'
+    '+.tmall.com': '223.5.5.5'
+    '+.alicdn.com': '223.5.5.5'
+    '+.taobaocdn.com': '223.5.5.5'
+    '+.tbcdn.cn': '223.5.5.5'
+    '+.goofish.com': '223.5.5.5'
+    '+.xianyu.mobi': '223.5.5.5'
+    '+.alipay.com': '223.5.5.5'
+    '+.alipayobjects.com': '223.5.5.5'
+    '+.alipaydns.com': '223.5.5.5'
+
+    # 拼多多
+    '+.pinduoduo.com': '223.5.5.5'
+    '+.pinduoduo.net': '223.5.5.5'
+    '+.pddpic.com': '223.5.5.5'
+    '+.yangkeduo.com': '223.5.5.5'
+
+    # 抖音 / 字节
+    '+.douyin.com': '223.5.5.5'
+    '+.douyincdn.com': '223.5.5.5'
+    '+.douyinpic.com': '223.5.5.5'
+    '+.douyinstatic.com': '223.5.5.5'
+    '+.douyinvod.com': '223.5.5.5'
+    '+.amemv.com': '223.5.5.5'
+    '+.snssdk.com': '223.5.5.5'
+    '+.byteimg.com': '223.5.5.5'
+    '+.bytedance.com': '223.5.5.5'
+
+    # 携程 / 去哪儿
+    '+.ctrip.com': '223.5.5.5'
+    '+.ctrip.cn': '223.5.5.5'
+    '+.c-ctrip.com': '223.5.5.5'
+    '+.tripcdn.com': '223.5.5.5'
+    '+.qunar.com': '223.5.5.5'
+    '+.qunarzz.com': '223.5.5.5'
+
+    # 滴滴
+    '+.didi.cn': '223.5.5.5'
+    '+.didichuxing.com': '223.5.5.5'
+    '+.didistatic.com': '223.5.5.5'
+    '+.xiaojukeji.com': '223.5.5.5'
+    '+.udache.com': '223.5.5.5'
+
+    # 12306
+    '+.12306.cn': '223.5.5.5'
+    '+.95306.cn': '223.5.5.5'
+    '+.china-railway.com.cn': '223.5.5.5'
+
+    # 京东 / 京东支付
+    '+.jd.com': '223.5.5.5'
+    '+.360buyimg.com': '223.5.5.5'
+    '+.jdcdn.com': '223.5.5.5'
+    '+.jdpay.com': '223.5.5.5'
+
+    # 微信 / 微信支付：优先腾讯 DoH
+    '+.qq.com': '119.29.29.29'
+    '+.weixin.com': '119.29.29.29'
+    '+.wechat.com': '119.29.29.29'
+    '+.servicewechat.com': '119.29.29.29'
+    '+.tenpay.com': '119.29.29.29'
+    '+.wechatpay.com': '119.29.29.29'
+    '+.qpic.cn': '119.29.29.29'
+    '+.qlogo.cn': '119.29.29.29'
+    '+.gtimg.com': '119.29.29.29'
+
+    # 已有国内高频 App
+    '+.meituan.com': '223.5.5.5'
+    '+.sankuai.com': '223.5.5.5'
+    '+.dianping.com': '223.5.5.5'
+    # Bilibili 中国大陆：API / 视频 / 图片 / CDN
+    '+.bilibili.com': '223.5.5.5'
+    '+.bilibili.cn': '223.5.5.5'
+    '+.biliapi.com': '223.5.5.5'
+    '+.biliapi.net': '223.5.5.5'
+    '+.bilivideo.com': '223.5.5.5'
+    '+.bilivideo.cn': '223.5.5.5'
+    '+.bilivideo.net': '223.5.5.5'
+    '+.hdslb.com': '223.5.5.5'
+    '+.hdslb.net': '223.5.5.5'
+    '+.hdslb.org': '223.5.5.5'
+    '+.biliimg.com': '223.5.5.5'
+    '+.bilicdn1.com': '223.5.5.5'
+    '+.bilicdn2.com': '223.5.5.5'
+    '+.bilicdn3.com': '223.5.5.5'
+    '+.bilicdn4.com': '223.5.5.5'
+    '+.bilicdn5.com': '223.5.5.5'
+    '+.acgvideo.com': '223.5.5.5'
+    '+.b23.tv': '223.5.5.5'
+    '+.xiaohongshu.com': '223.5.5.5'
+    '+.xhscdn.com': '223.5.5.5'
+    '+.amap.com': '223.5.5.5'
+    '+.autonavi.com': '223.5.5.5'
+
+    # 小红书补齐：图片 / 视频 CDN
+    '+.xhscdn.net': '223.5.5.5'
+    '+.fengkongcloud.com': '223.5.5.5'
+
+    # Apple Music 补齐：音频流 / 媒体 / CDN
+    '+.music.apple.com': '223.5.5.5'
+    '+.applemusic.com': '223.5.5.5'
+    '+.blobstore.apple.com': '223.5.5.5'
+    '+.itunes.apple.com': '223.5.5.5'
+
+    # Apple 中国大陆常用生态
+    'music.apple.com': '223.5.5.5'
+    'apps.apple.com': '223.5.5.5'
+    'itunes.apple.com': '223.5.5.5'
+    '+.apple.com.cn': '223.5.5.5'
+    '+.icloud.com.cn': '223.5.5.5'
+    '+.mzstatic.com': '223.5.5.5'
+    '+.cdn-apple.com': '223.5.5.5'
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.home.arpa'
+    - '*.in-addr.arpa'
+    - '*.ip6.arpa'
+    - '*._dns-sd._udp.*.in-addr.arpa'
+    - 'localhost'
+    - 'localhost.weixin.qq.com'
+    - 'captive.apple.com'
+    - '+.stun.*.*'
+    - '+.stun.*.*.*'
+    - '+.stun.*.*.*.*'
+    - '+.stun.*.*.*.*.*'
+
+# 不替换原有 proxy-groups，只新增两个唯一命名的安全组。
+# 安全组内完全没有 DIRECT，避免任何国外流量因策略组选择而退化为直连。
+proxy-groups:
+  - name: 🔒 通用安全出口
+    type: url-test
+    include-all: true
+    # 同时匹配：
+    # 369-CF：CF 电信优选 / CF 联通优选 / CF 移动优选（含编号）
+    # CFData-WEB：VPS789优选 / WeTest优选 / 微测优选 / 优选 | ...
+    # 不匹配 DIRECT / REJECT / 原有策略组。
+    filter: '^(CF (电信|联通|移动)优选( [0-9]+)?|VPS789优选|WeTest优选|微测优选|优选 \|)'
+    url: http://www.gstatic.com/generate_204
+    interval: 600
+    tolerance: 100
+    lazy: true
+
+rule-providers:
+  Final-Alibaba:
+    behavior: domain
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Alibaba/Alibaba_Domain.yaml
+
+  Final-XianYu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XianYu/XianYu.yaml
+
+  Final-MeiTuan:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/MeiTuan/MeiTuan.yaml
+
+  Final-Eleme:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Eleme/Eleme.yaml
+
+  Final-BiliBili:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+
+  Final-XiaoHongShu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XiaoHongShu/XiaoHongShu.yaml
+
+  Final-Weibo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Weibo/Weibo.yaml
+
+  Final-Tencent:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Tencent/Tencent.yaml
+
+  Final-WeChat:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/WeChat/WeChat.yaml
+
+  Final-Baidu:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Baidu/Baidu.yaml
+
+  Final-DouYin:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DouYin/DouYin.yaml
+
+  Final-JingDong:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/JingDong/JingDong.yaml
+
+  Final-NetEase:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/NetEase/NetEase.yaml
+
+  Final-GaoDe:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GaoDe/GaoDe.yaml
+
+  Final-DiDi:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/DiDi/DiDi.yaml
+
+  Final-AppleMusic:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleMusic/AppleMusic.yaml
+
+  Final-AppStore:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppStore/AppStore.yaml
+
+  Final-iCloud:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/iCloud/iCloud.yaml
+
+  Final-AppleID:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleID/AppleID.yaml
+
+  Final-FindMy:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/FindMy/FindMy.yaml
+
+  Final-TestFlight:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TestFlight/TestFlight.yaml
+
+  Final-AppleFirmware:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleFirmware/AppleFirmware.yaml
+
+
+  Final-Pinduoduo:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Pinduoduo/Pinduoduo.yaml
+
+  Final-XieCheng:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/XieCheng/XieCheng.yaml
+
+  Final-12306:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/12306/12306.yaml
+
+  Final-AliPay:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AliPay/AliPay.yaml
+
+rules: #!replace
+  # 国内低延迟 DNS 传输：直接出站，避免国内 App 的 DNS 绕海外代理
+  - IP-CIDR,223.5.5.5/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.29/32,DIRECT,no-resolve
+
+  # ---- DNS 传输路由：v4 修复规则模式国外 DNS 直连失败 ----
+  # 国内定向 DoH 本地直连，保证国内 App 的 CDN 就近调度与低延迟
+  - DOMAIN,dns.alidns.com,DIRECT
+  - DOMAIN,doh.pub,DIRECT
+
+  # 国外公共 DoH 必须经过安全代理；不能在规则模式下直接从中国网络访问
+  - IP-CIDR,1.1.1.1/32,🔒 通用安全出口,no-resolve
+  - IP-CIDR,8.8.8.8/32,🔒 通用安全出口,no-resolve
+
+  # ---- v7 Bilibili：中国大陆优先 ----
+  # 国际版 / Bstar 端点不作为中国大陆 Bilibili 直连路径。
+  # 若 App 自己请求国际服务，则交给安全代理；不让它混入大陆 CDN。
+  - DOMAIN-SUFFIX,bilibili.tv,🔒 通用安全出口
+  - DOMAIN-SUFFIX,biliintl.com,🔒 通用安全出口
+  - DOMAIN-SUFFIX,biliintl.co,🔒 通用安全出口
+  - DOMAIN,p-bstarstatic.akamaized.net,🔒 通用安全出口
+  - DOMAIN,p.bstarstatic.com,🔒 通用安全出口
+  - DOMAIN,upos-bstar-mirrorakam.akamaized.net,🔒 通用安全出口
+  - DOMAIN,upos-bstar1-mirrorakam.akamaized.net,🔒 通用安全出口
+
+  # 中国大陆主站 / API / 视频 / 图片 / CDN 快速直连
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.cn,DIRECT
+  - DOMAIN-SUFFIX,biliapi.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.net,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.cn,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.net,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.net,DIRECT
+  - DOMAIN-SUFFIX,hdslb.org,DIRECT
+  - DOMAIN-SUFFIX,biliimg.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn1.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn2.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn3.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn4.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn5.com,DIRECT
+  - DOMAIN-SUFFIX,acgvideo.com,DIRECT
+  - DOMAIN-SUFFIX,b23.tv,DIRECT
+  - DOMAIN,upos-hz-mirrorakam.akamaized.net,DIRECT
+
+  # ---- v6 高频直连快速命中：减少规则集顺序扫描 ----
+  # 小红书图片 / 视频 / 风控
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.net,DIRECT
+  - DOMAIN-SUFFIX,fengkongcloud.com,DIRECT
+
+  # Apple Music 中国大陆常用音频 / 媒体
+  - DOMAIN-SUFFIX,music.apple.com,DIRECT
+  - DOMAIN-SUFFIX,applemusic.com,DIRECT
+  - DOMAIN-SUFFIX,blobstore.apple.com,DIRECT
+  - DOMAIN-SUFFIX,itunes.apple.com,DIRECT
+  - DOMAIN,aod-ssl.itunes.apple.com,DIRECT
+  - DOMAIN,audio-ssl.itunes.apple.com,DIRECT
+  - DOMAIN,streamingaudio.itunes.apple.com,DIRECT
+  - DOMAIN,mvod.itunes.apple.com,DIRECT
+
+  # ---- 本机 / 局域网 ----
+  - DOMAIN,localhost.weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,in-addr.arpa,DIRECT
+  - DOMAIN-SUFFIX,ip6.arpa,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+
+  # ---- 国内 App 的 HTTPDNS：仅这些已知入口直连，降低淘宝/美团等延迟 ----
+  - IP-CIDR,203.107.1.1/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.98/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.99/32,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,httpdns.alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,httpdns.meituan.com,DIRECT
+
+  # ---- 关键国内域名显式直连（即使远程规则下载失败也可用） ----
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,taobaocdn.com,DIRECT
+  - DOMAIN-SUFFIX,tbcdn.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  - DOMAIN-SUFFIX,goofish.com,DIRECT
+  - DOMAIN-SUFFIX,xianyu.mobi,DIRECT
+
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.net,DIRECT
+  - DOMAIN-SUFFIX,sankuai.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,dpfile.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.net,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,b23.tv,DIRECT
+
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,weibocdn.com,DIRECT
+
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bcebos.com,DIRECT
+
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyincdn.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,toutiao.com,DIRECT
+
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,amapauto.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-SUFFIX,gaode.com,DIRECT
+
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+
+  # ---- 国内服务规则集补全 ----
+  - RULE-SET,Final-Alibaba,DIRECT
+  - RULE-SET,Final-XianYu,DIRECT
+  - RULE-SET,Final-MeiTuan,DIRECT
+  - RULE-SET,Final-Eleme,DIRECT
+  - RULE-SET,Final-BiliBili,DIRECT
+  - RULE-SET,Final-XiaoHongShu,DIRECT
+  - RULE-SET,Final-Weibo,DIRECT
+  - RULE-SET,Final-Tencent,DIRECT
+  - RULE-SET,Final-WeChat,DIRECT
+  - RULE-SET,Final-Baidu,DIRECT
+  - RULE-SET,Final-DouYin,DIRECT
+  - RULE-SET,Final-JingDong,DIRECT
+  - RULE-SET,Final-NetEase,DIRECT
+  - RULE-SET,Final-GaoDe,DIRECT
+  - RULE-SET,Final-DiDi,DIRECT
+
+  # ---- 所有其他流量：没有任何 DIRECT 备用路径 ----
+  # ---- Apple 中国大陆常用生态：直连 ----
+  # Apple Music / App Store / iCloud 中国区 / Apple ID / 查找 / TestFlight / 系统更新
+  # 明确不把 Apple TV+ / Apple News 整体设为 DIRECT，避免影响需要海外区域的服务。
+  - DOMAIN-SUFFIX,apple.com.cn,DIRECT
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT
+  - DOMAIN,music.apple.com,DIRECT
+  - DOMAIN,apps.apple.com,DIRECT
+  - DOMAIN,itunes.apple.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-content.com,DIRECT
+  - DOMAIN-SUFFIX,apple-cloudkit.com,DIRECT
+  - DOMAIN-SUFFIX,me.com,DIRECT
+  - DOMAIN-SUFFIX,apple-dns.net,DIRECT
+  - DOMAIN,push.apple.com,DIRECT
+  - DOMAIN,gs.apple.com,DIRECT
+  - DOMAIN,gdmf.apple.com,DIRECT
+  - DOMAIN,mesu.apple.com,DIRECT
+
+  - RULE-SET,Final-AppleMusic,DIRECT
+  - RULE-SET,Final-AppStore,DIRECT
+  - RULE-SET,Final-iCloud,DIRECT
+  - RULE-SET,Final-AppleID,DIRECT
+  - RULE-SET,Final-FindMy,DIRECT
+  - RULE-SET,Final-TestFlight,DIRECT
+  - RULE-SET,Final-AppleFirmware,DIRECT
+
+  # ---- 国内高频 App v3 补齐：显式直连 ----
+
+  # 拼多多
+  - DOMAIN-SUFFIX,pinduoduo.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.net,DIRECT
+  - DOMAIN-SUFFIX,pddpic.com,DIRECT
+  - DOMAIN-SUFFIX,yangkeduo.com,DIRECT
+
+  # 抖音 / 字节视频资源
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,ixigua.com,DIRECT
+  - DOMAIN-SUFFIX,ixiguavideo.com,DIRECT
+
+  # 携程
+  - DOMAIN-SUFFIX,c-ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.cn,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctripbiz.com,DIRECT
+  - DOMAIN-SUFFIX,tripcdn.com,DIRECT
+  - DOMAIN-SUFFIX,suanya.com,DIRECT
+  - DOMAIN-SUFFIX,tieyou.com,DIRECT
+
+  # 去哪儿
+  - DOMAIN-SUFFIX,qunar.com,DIRECT
+  - DOMAIN-SUFFIX,qunarzz.com,DIRECT
+
+  # 滴滴
+  - DOMAIN-SUFFIX,didi.cn,DIRECT
+  - DOMAIN-SUFFIX,didichuxing.com,DIRECT
+  - DOMAIN-SUFFIX,didistatic.com,DIRECT
+  - DOMAIN-SUFFIX,didiapp.net.cn,DIRECT
+  - DOMAIN-SUFFIX,didiopenapi.com,DIRECT
+  - DOMAIN-SUFFIX,udache.com,DIRECT
+  - DOMAIN-SUFFIX,xiaojukeji.com,DIRECT
+
+  # 12306 / 国铁
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,95306.cn,DIRECT
+  - DOMAIN-SUFFIX,china-railway.com.cn,DIRECT
+  - DOMAIN-SUFFIX,rails.cn,DIRECT
+
+  # 京东 / 京东支付
+  - DOMAIN-SUFFIX,360buy.com,DIRECT
+  - DOMAIN-SUFFIX,jdcdn.com,DIRECT
+  - DOMAIN-SUFFIX,jdpay.com,DIRECT
+  - DOMAIN-SUFFIX,jdpaydns.com,DIRECT
+  - DOMAIN-SUFFIX,jdfinance.com,DIRECT
+  - DOMAIN-SUFFIX,jdjinrong.com,DIRECT
+
+  # 支付宝
+  - DOMAIN-SUFFIX,alipay.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.com.cn,DIRECT
+  - DOMAIN-SUFFIX,alipay.net,DIRECT
+  - DOMAIN-SUFFIX,alipaydns.com,DIRECT
+  - DOMAIN-SUFFIX,alipaylog.com,DIRECT
+  - DOMAIN-SUFFIX,alipayplus.com,DIRECT
+
+  # 微信 / 微信支付
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.com,DIRECT
+  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+
+  # 规则集兜底补全
+  - RULE-SET,Final-Pinduoduo,DIRECT
+  - RULE-SET,Final-XieCheng,DIRECT
+  - RULE-SET,Final-12306,DIRECT
+  - RULE-SET,Final-AliPay,DIRECT
+
+  - MATCH,🔒 通用安全出口
