@@ -1,5 +1,5 @@
-name: Stash Universal Minimal v1 (DNS AntiLeak + Auto Fast)
-desc: 回归简洁版。沿用此前已验证稳定的 DNS 防泄漏基线；仅新增一个同时兼容 369-CF优选 与 CFData-WEB-优选 的最低延迟自动组；国内域名采用 ChinaMaxNoIP Domain 直连，Apple 中国大陆常用生态直连；所有其他流量统一走代理。无 GEOIP,CN、无 DIRECT 兜底、无逐 App DNS 策略、无 HTTPDNS 拦截。
+name: Stash Universal Minimal v2 (Strict CN + DNS AntiLeak + Auto Fast)
+desc: 严格国内白名单修复版。移除错误包含外国检测网站的 ChinaMaxNoIP 广泛规则集，保留轻量 Fake-IP/DoH 和通用最低延迟组；仅明确国内应用和 Apple 服务直连，未命中一律代理。兼容 Stash 3.1.1。
 category: General
 
 ipv6: false
@@ -46,11 +46,6 @@ proxy-groups:
     lazy: true
 
 rule-providers:
-  Minimal-China:
-    behavior: domain
-    interval: 86400
-    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMaxNoIP/ChinaMaxNoIP_Domain.yaml
-
   Minimal-AppleMusic:
     behavior: classical
     interval: 86400
@@ -99,6 +94,98 @@ rules: #!replace
   - RULE-SET,Minimal-iCloud,DIRECT
   - RULE-SET,Minimal-AppleID,DIRECT
 
-  - RULE-SET,Minimal-China,DIRECT
+  # 国内明确白名单，不使用宽泛 ChinaMaxNoIP / China / GEOIP,CN
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,taobaocdn.com,DIRECT
+  - DOMAIN-SUFFIX,tbcdn.cn,DIRECT
+  - DOMAIN-SUFFIX,goofish.com,DIRECT
+  - DOMAIN-SUFFIX,xianyu.mobi,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  - DOMAIN-SUFFIX,alipaydns.com,DIRECT
+  - DOMAIN-SUFFIX,alipaylog.com,DIRECT
+  - DOMAIN-SUFFIX,alipayplus.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.net,DIRECT
+  - DOMAIN-SUFFIX,pddpic.com,DIRECT
+  - DOMAIN-SUFFIX,yangkeduo.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,jdcdn.com,DIRECT
+  - DOMAIN-SUFFIX,jdpay.com,DIRECT
+  - DOMAIN-SUFFIX,jdfinance.com,DIRECT
+  - DOMAIN-SUFFIX,jdjinrong.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyincdn.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.cn,DIRECT
+  - DOMAIN-SUFFIX,c-ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,tripcdn.com,DIRECT
+  - DOMAIN-SUFFIX,qunar.com,DIRECT
+  - DOMAIN-SUFFIX,qunarzz.com,DIRECT
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,95306.cn,DIRECT
+  - DOMAIN-SUFFIX,china-railway.com.cn,DIRECT
+  - DOMAIN-SUFFIX,didi.cn,DIRECT
+  - DOMAIN-SUFFIX,didichuxing.com,DIRECT
+  - DOMAIN-SUFFIX,didistatic.com,DIRECT
+  - DOMAIN-SUFFIX,xiaojukeji.com,DIRECT
+  - DOMAIN-SUFFIX,udache.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.cn,DIRECT
+  - DOMAIN-SUFFIX,biliapi.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.net,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.net,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.net,DIRECT
+  - DOMAIN-SUFFIX,biliimg.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn1.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn2.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn3.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn4.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn5.com,DIRECT
+  - DOMAIN-SUFFIX,acgvideo.com,DIRECT
+  - DOMAIN-SUFFIX,b23.tv,DIRECT
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.net,DIRECT
+  - DOMAIN-SUFFIX,fengkongcloud.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.net,DIRECT
+  - DOMAIN-SUFFIX,sankuai.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,dpfile.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,weibocdn.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-SUFFIX,gaode.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bcebos.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
 
   - MATCH,⚡ 通用最低延迟
