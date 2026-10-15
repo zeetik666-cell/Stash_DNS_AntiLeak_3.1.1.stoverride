@@ -41,7 +41,7 @@ proxy-groups:
     include-all: true
     filter: '^(CF (电信|联通|移动)优选( [0-9]+)?|VPS789优选|WeTest优选|微测优选|优选 \|)'
     url: http://www.gstatic.com/generate_204
-    interval: 600
+    interval: 180
     tolerance: 50
     lazy: true
 
