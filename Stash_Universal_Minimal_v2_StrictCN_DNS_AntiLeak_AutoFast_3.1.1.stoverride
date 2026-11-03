@@ -102,6 +102,22 @@ rules: #!replace
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
 
+  # 米家中国大陆云服务 / 设备控制 / 状态 / 素材 / 推送（与原本局域网 DIRECT 规则共用）
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img.com,DIRECT
+  - DOMAIN-SUFFIX,mi-cdn.com,DIRECT
+  - DOMAIN-SUFFIX,mi-static.com,DIRECT
+  - DOMAIN-SUFFIX,miot-spec.org,DIRECT
+  - DOMAIN-SUFFIX,mipush.com,DIRECT
+  - DOMAIN-SUFFIX,miwifi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomicp.com,DIRECT
+  - DOMAIN-SUFFIX,mijia.tech,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.com,DIRECT
+  - DOMAIN-SUFFIX,micoce.com.cn,DIRECT
+
   - DOMAIN-SUFFIX,bilibili.tv,⚡ 通用最低延迟
   - DOMAIN-SUFFIX,biliintl.com,⚡ 通用最低延迟
   - DOMAIN-SUFFIX,biliintl.co,⚡ 通用最低延迟
