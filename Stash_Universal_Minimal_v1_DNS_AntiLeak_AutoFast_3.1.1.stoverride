@@ -34,6 +34,34 @@ dns: #!replace
     '+.bilicdn5.com': '223.5.5.5'
     '+.acgvideo.com': '223.5.5.5'
     '+.b23.tv': '223.5.5.5'
+
+    # 米家中国大陆云端 API / 设备同步 / 推送 / 素材优先腾讯国内 DNS
+    '+.mi.com': '119.29.29.29'
+    '+.xiaomi.com': '119.29.29.29'
+    '+.xiaomi.net': '119.29.29.29'
+    '+.miui.com': '119.29.29.29'
+    '+.mi-img.com': '119.29.29.29'
+    '+.mi-cdn.com': '119.29.29.29'
+    '+.mi-static.com': '119.29.29.29'
+    '+.miot-spec.org': '119.29.29.29'
+    '+.mipush.com': '119.29.29.29'
+    '+.miwifi.com': '119.29.29.29'
+    '+.xiaomicp.com': '119.29.29.29'
+    '+.mijia.tech': '119.29.29.29'
+    '+.xiaomidns.com': '119.29.29.29'
+    '+.micoce.com.cn': '119.29.29.29'
+    '+.mi.com.cn': '119.29.29.29'
+    '+.mi.cn': '119.29.29.29'
+    '+.xiaomi.cn': '119.29.29.29'
+    '+.mi-cache.com': '119.29.29.29'
+    '+.mi-img1.com': '119.29.29.29'
+    '+.mi-img2.com': '119.29.29.29'
+    '+.mi-img3.com': '119.29.29.29'
+    '+.mi-img4.com': '119.29.29.29'
+    '+.mi-img5.com': '119.29.29.29'
+    '+.xiaomidns.cn': '119.29.29.29'
+    '+.xiaomidns.com.cn': '119.29.29.29'
+    '+.xiaomicache.com': '119.29.29.29'
   fake-ip-filter:
     - '*.lan'
     - '*.local'
@@ -101,6 +129,10 @@ rules: #!replace
   - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  # 常见局域网发现：mDNS、SSDP 与 IPv4 广播；仅对被隧道捕获的报文有效
+  - IP-CIDR,224.0.0.251/32,DIRECT,no-resolve
+  - IP-CIDR,239.255.255.250/32,DIRECT,no-resolve
+  - IP-CIDR,255.255.255.255/32,DIRECT,no-resolve
 
   # 米家中国大陆云服务 / 设备控制 / 状态 / 素材 / 推送（与原本局域网 DIRECT 规则共用）
   - DOMAIN-SUFFIX,mi.com,DIRECT
@@ -117,6 +149,20 @@ rules: #!replace
   - DOMAIN-SUFFIX,mijia.tech,DIRECT
   - DOMAIN-SUFFIX,xiaomidns.com,DIRECT
   - DOMAIN-SUFFIX,micoce.com.cn,DIRECT
+
+  # 补齐官方小米规则中的云控与静态资源域名
+  - DOMAIN-SUFFIX,mi.com.cn,DIRECT
+  - DOMAIN-SUFFIX,mi.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.cn,DIRECT
+  - DOMAIN-SUFFIX,mi-cache.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img1.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img2.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img3.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img4.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img5.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.com.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomicache.com,DIRECT
 
   - DOMAIN-SUFFIX,bilibili.tv,⚡ 通用最低延迟
   - DOMAIN-SUFFIX,biliintl.com,⚡ 通用最低延迟
