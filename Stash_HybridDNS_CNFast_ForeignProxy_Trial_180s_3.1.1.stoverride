@@ -1,0 +1,360 @@
+name: Stash Hybrid DNS Trial (CN Fast + Foreign Proxy 180s)
+desc: 实验版。沿用已验证流畅的严格分流与180秒测速，国内明确域名定向国内DNS；其他域名用经自动代理的Cloudflare和Google DoH。原诊断版保持不变。请单独启用并核查DNS泄漏及米家淘宝速度。
+category: General
+
+ipv6: false
+
+dns: #!replace
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  follow-rule: true
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  # 未列入中国国内域名白名单的查询，使用加密 DNS。
+  # follow-rule=true 且 DNS 目标 IP 在下方规则中固定走安全代理。
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  # 已知国内应用及图片/CDN 域名用国内解析器，保持原始主配置的就近调度。
+  # 按 Stash 3.1.1 使用标量 DNS 地址，不使用数组值。
+  nameserver-policy:
+    '+.mi.com': '119.29.29.29'
+    '+.xiaomi.com': '119.29.29.29'
+    '+.xiaomi.net': '119.29.29.29'
+    '+.miui.com': '119.29.29.29'
+    '+.mi-img.com': '119.29.29.29'
+    '+.mi-cdn.com': '119.29.29.29'
+    '+.mi-static.com': '119.29.29.29'
+    '+.miot-spec.org': '119.29.29.29'
+    '+.mipush.com': '119.29.29.29'
+    '+.miwifi.com': '119.29.29.29'
+    '+.xiaomicp.com': '119.29.29.29'
+    '+.mijia.tech': '119.29.29.29'
+    '+.xiaomidns.com': '119.29.29.29'
+    '+.micoce.com.cn': '119.29.29.29'
+    '+.mi.com.cn': '119.29.29.29'
+    '+.mi.cn': '119.29.29.29'
+    '+.xiaomi.cn': '119.29.29.29'
+    '+.mi-cache.com': '119.29.29.29'
+    '+.mi-img1.com': '119.29.29.29'
+    '+.mi-img2.com': '119.29.29.29'
+    '+.mi-img3.com': '119.29.29.29'
+    '+.mi-img4.com': '119.29.29.29'
+    '+.mi-img5.com': '119.29.29.29'
+    '+.xiaomidns.cn': '119.29.29.29'
+    '+.xiaomidns.com.cn': '119.29.29.29'
+    '+.xiaomicache.com': '119.29.29.29'
+    '+.apple.com.cn': '223.5.5.5'
+    '+.icloud.com.cn': '223.5.5.5'
+    '+.taobao.com': '223.5.5.5'
+    '+.tmall.com': '223.5.5.5'
+    '+.alicdn.com': '223.5.5.5'
+    '+.taobaocdn.com': '223.5.5.5'
+    '+.tbcdn.cn': '223.5.5.5'
+    '+.goofish.com': '223.5.5.5'
+    '+.xianyu.mobi': '223.5.5.5'
+    '+.alipay.com': '223.5.5.5'
+    '+.alipayobjects.com': '223.5.5.5'
+    '+.alipaydns.com': '223.5.5.5'
+    '+.alipaylog.com': '223.5.5.5'
+    '+.alipayplus.com': '223.5.5.5'
+    '+.pinduoduo.com': '223.5.5.5'
+    '+.pinduoduo.net': '223.5.5.5'
+    '+.pddpic.com': '223.5.5.5'
+    '+.yangkeduo.com': '223.5.5.5'
+    '+.jd.com': '223.5.5.5'
+    '+.360buyimg.com': '223.5.5.5'
+    '+.jdcdn.com': '223.5.5.5'
+    '+.jdpay.com': '223.5.5.5'
+    '+.jdfinance.com': '223.5.5.5'
+    '+.jdjinrong.com': '223.5.5.5'
+    '+.qq.com': '223.5.5.5'
+    '+.weixin.com': '223.5.5.5'
+    '+.wechat.com': '223.5.5.5'
+    '+.servicewechat.com': '223.5.5.5'
+    '+.tenpay.com': '223.5.5.5'
+    '+.wechatpay.com': '223.5.5.5'
+    '+.qpic.cn': '223.5.5.5'
+    '+.qlogo.cn': '223.5.5.5'
+    '+.gtimg.com': '223.5.5.5'
+    '+.douyin.com': '223.5.5.5'
+    '+.douyincdn.com': '223.5.5.5'
+    '+.douyinpic.com': '223.5.5.5'
+    '+.douyinstatic.com': '223.5.5.5'
+    '+.douyinvod.com': '223.5.5.5'
+    '+.idouyinvod.com': '223.5.5.5'
+    '+.amemv.com': '223.5.5.5'
+    '+.snssdk.com': '223.5.5.5'
+    '+.byteimg.com': '223.5.5.5'
+    '+.bytedance.com': '223.5.5.5'
+    '+.pstatp.com': '223.5.5.5'
+    '+.ctrip.com': '223.5.5.5'
+    '+.ctrip.cn': '223.5.5.5'
+    '+.c-ctrip.com': '223.5.5.5'
+    '+.tripcdn.com': '223.5.5.5'
+    '+.qunar.com': '223.5.5.5'
+    '+.qunarzz.com': '223.5.5.5'
+    '+.12306.cn': '223.5.5.5'
+    '+.95306.cn': '223.5.5.5'
+    '+.china-railway.com.cn': '223.5.5.5'
+    '+.didi.cn': '223.5.5.5'
+    '+.didichuxing.com': '223.5.5.5'
+    '+.didistatic.com': '223.5.5.5'
+    '+.xiaojukeji.com': '223.5.5.5'
+    '+.udache.com': '223.5.5.5'
+    '+.bilibili.com': '223.5.5.5'
+    '+.bilibili.cn': '223.5.5.5'
+    '+.biliapi.com': '223.5.5.5'
+    '+.biliapi.net': '223.5.5.5'
+    '+.bilivideo.com': '223.5.5.5'
+    '+.bilivideo.net': '223.5.5.5'
+    '+.hdslb.com': '223.5.5.5'
+    '+.hdslb.net': '223.5.5.5'
+    '+.biliimg.com': '223.5.5.5'
+    '+.bilicdn1.com': '223.5.5.5'
+    '+.bilicdn2.com': '223.5.5.5'
+    '+.bilicdn3.com': '223.5.5.5'
+    '+.bilicdn4.com': '223.5.5.5'
+    '+.bilicdn5.com': '223.5.5.5'
+    '+.acgvideo.com': '223.5.5.5'
+    '+.b23.tv': '223.5.5.5'
+    '+.xiaohongshu.com': '223.5.5.5'
+    '+.xhscdn.com': '223.5.5.5'
+    '+.xhscdn.net': '223.5.5.5'
+    '+.fengkongcloud.com': '223.5.5.5'
+    '+.meituan.com': '223.5.5.5'
+    '+.meituan.net': '223.5.5.5'
+    '+.sankuai.com': '223.5.5.5'
+    '+.dianping.com': '223.5.5.5'
+    '+.dpfile.com': '223.5.5.5'
+    '+.ele.me': '223.5.5.5'
+    '+.weibo.com': '223.5.5.5'
+    '+.weibocdn.com': '223.5.5.5'
+    '+.amap.com': '223.5.5.5'
+    '+.autonavi.com': '223.5.5.5'
+    '+.gaode.com': '223.5.5.5'
+    '+.baidu.com': '223.5.5.5'
+    '+.bdstatic.com': '223.5.5.5'
+    '+.bcebos.com': '223.5.5.5'
+    '+.163.com': '223.5.5.5'
+    '+.126.net': '223.5.5.5'
+    'music.apple.com': '223.5.5.5'
+    'apps.apple.com': '223.5.5.5'
+    'itunes.apple.com': '223.5.5.5'
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '*.home.arpa'
+    - '*.in-addr.arpa'
+    - '*.ip6.arpa'
+    - '*._dns-sd._udp.*.in-addr.arpa'
+    - 'localhost'
+    - 'localhost.weixin.qq.com'
+    - '+.stun.*.*'
+    - '+.stun.*.*.*'
+    - '+.stun.*.*.*.*'
+    - '+.stun.*.*.*.*.*'
+    - 'captive.apple.com'
+    - '*.icloud.com'
+    - '*.icloud-content.com'
+    - '*.apple-cloudkit.com'
+    - '*.cdn-apple.com'
+    - '*.mzstatic.com'
+
+proxy-groups:
+  - name: ⚡ 通用最低延迟
+    type: url-test
+    include-all: true
+    filter: '^(CF (电信|联通|移动)优选( [0-9]+)?|VPS789优选|WeTest优选|微测优选|优选 \|)'
+    url: http://www.gstatic.com/generate_204
+    interval: 180
+    tolerance: 50
+    lazy: true
+
+rule-providers:
+  Minimal-AppleMusic:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleMusic/AppleMusic.yaml
+
+  Minimal-AppStore:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppStore/AppStore.yaml
+
+  Minimal-iCloud:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/iCloud/iCloud.yaml
+
+  Minimal-AppleID:
+    behavior: classical
+    interval: 86400
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/AppleID/AppleID.yaml
+
+rules: #!replace
+  # 国外 DoH 传输固定经安全代理，不允许从国内 DIRECT 发送。
+  - IP-CIDR,1.1.1.1/32,⚡ 通用最低延迟,no-resolve
+  - IP-CIDR,8.8.8.8/32,⚡ 通用最低延迟,no-resolve
+  # 国内 DNS 上游的查询直接出站，避免被最终海外兜底代理。
+  - IP-CIDR,223.5.5.5/32,DIRECT,no-resolve
+  - IP-CIDR,119.29.29.29/32,DIRECT,no-resolve
+
+  - DOMAIN,localhost.weixin.qq.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,in-addr.arpa,DIRECT
+  - DOMAIN-SUFFIX,ip6.arpa,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  # 常见局域网发现：mDNS、SSDP 与 IPv4 广播；仅对被隧道捕获的报文有效
+  - IP-CIDR,224.0.0.251/32,DIRECT,no-resolve
+  - IP-CIDR,239.255.255.250/32,DIRECT,no-resolve
+  - IP-CIDR,255.255.255.255/32,DIRECT,no-resolve
+
+  # 米家中国大陆云服务 / 设备控制 / 状态 / 素材 / 推送（与原本局域网 DIRECT 规则共用）
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img.com,DIRECT
+  - DOMAIN-SUFFIX,mi-cdn.com,DIRECT
+  - DOMAIN-SUFFIX,mi-static.com,DIRECT
+  - DOMAIN-SUFFIX,miot-spec.org,DIRECT
+  - DOMAIN-SUFFIX,mipush.com,DIRECT
+  - DOMAIN-SUFFIX,miwifi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomicp.com,DIRECT
+  - DOMAIN-SUFFIX,mijia.tech,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.com,DIRECT
+  - DOMAIN-SUFFIX,micoce.com.cn,DIRECT
+
+  # 补齐官方小米规则中的云控与静态资源域名
+  - DOMAIN-SUFFIX,mi.com.cn,DIRECT
+  - DOMAIN-SUFFIX,mi.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.cn,DIRECT
+  - DOMAIN-SUFFIX,mi-cache.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img1.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img2.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img3.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img4.com,DIRECT
+  - DOMAIN-SUFFIX,mi-img5.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomidns.com.cn,DIRECT
+  - DOMAIN-SUFFIX,xiaomicache.com,DIRECT
+
+  - DOMAIN-SUFFIX,bilibili.tv,⚡ 通用最低延迟
+  - DOMAIN-SUFFIX,biliintl.com,⚡ 通用最低延迟
+  - DOMAIN-SUFFIX,biliintl.co,⚡ 通用最低延迟
+  - DOMAIN,p-bstarstatic.akamaized.net,⚡ 通用最低延迟
+  - DOMAIN,p.bstarstatic.com,⚡ 通用最低延迟
+  - DOMAIN,upos-bstar-mirrorakam.akamaized.net,⚡ 通用最低延迟
+  - DOMAIN,upos-bstar1-mirrorakam.akamaized.net,⚡ 通用最低延迟
+
+  - DOMAIN-SUFFIX,apple.com.cn,DIRECT
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT
+  - RULE-SET,Minimal-AppleMusic,DIRECT
+  - RULE-SET,Minimal-AppStore,DIRECT
+  - RULE-SET,Minimal-iCloud,DIRECT
+  - RULE-SET,Minimal-AppleID,DIRECT
+
+  # 国内明确白名单，不使用宽泛 ChinaMaxNoIP / China / GEOIP,CN
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,taobaocdn.com,DIRECT
+  - DOMAIN-SUFFIX,tbcdn.cn,DIRECT
+  - DOMAIN-SUFFIX,goofish.com,DIRECT
+  - DOMAIN-SUFFIX,xianyu.mobi,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  - DOMAIN-SUFFIX,alipaydns.com,DIRECT
+  - DOMAIN-SUFFIX,alipaylog.com,DIRECT
+  - DOMAIN-SUFFIX,alipayplus.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.com,DIRECT
+  - DOMAIN-SUFFIX,pinduoduo.net,DIRECT
+  - DOMAIN-SUFFIX,pddpic.com,DIRECT
+  - DOMAIN-SUFFIX,yangkeduo.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,jdcdn.com,DIRECT
+  - DOMAIN-SUFFIX,jdpay.com,DIRECT
+  - DOMAIN-SUFFIX,jdfinance.com,DIRECT
+  - DOMAIN-SUFFIX,jdjinrong.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,wechatpay.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyincdn.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,byteimg.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,ctrip.cn,DIRECT
+  - DOMAIN-SUFFIX,c-ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,tripcdn.com,DIRECT
+  - DOMAIN-SUFFIX,qunar.com,DIRECT
+  - DOMAIN-SUFFIX,qunarzz.com,DIRECT
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,95306.cn,DIRECT
+  - DOMAIN-SUFFIX,china-railway.com.cn,DIRECT
+  - DOMAIN-SUFFIX,didi.cn,DIRECT
+  - DOMAIN-SUFFIX,didichuxing.com,DIRECT
+  - DOMAIN-SUFFIX,didistatic.com,DIRECT
+  - DOMAIN-SUFFIX,xiaojukeji.com,DIRECT
+  - DOMAIN-SUFFIX,udache.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.cn,DIRECT
+  - DOMAIN-SUFFIX,biliapi.com,DIRECT
+  - DOMAIN-SUFFIX,biliapi.net,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.net,DIRECT
+  - DOMAIN-SUFFIX,hdslb.com,DIRECT
+  - DOMAIN-SUFFIX,hdslb.net,DIRECT
+  - DOMAIN-SUFFIX,biliimg.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn1.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn2.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn3.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn4.com,DIRECT
+  - DOMAIN-SUFFIX,bilicdn5.com,DIRECT
+  - DOMAIN-SUFFIX,acgvideo.com,DIRECT
+  - DOMAIN-SUFFIX,b23.tv,DIRECT
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.com,DIRECT
+  - DOMAIN-SUFFIX,xhscdn.net,DIRECT
+  - DOMAIN-SUFFIX,fengkongcloud.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.net,DIRECT
+  - DOMAIN-SUFFIX,sankuai.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,dpfile.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,weibocdn.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-SUFFIX,gaode.com,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bcebos.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+
+  - MATCH,⚡ 通用最低延迟
